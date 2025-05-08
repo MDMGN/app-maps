@@ -49,6 +49,7 @@ export default function App() {
         latitude: current.coords.latitude,
         longitude: current.coords.longitude,
       };
+
       setLocation(currentLocation.current);
     })();
   }, []);
@@ -57,9 +58,10 @@ export default function App() {
 
   // NUEVO: función para obtener ruta desde OSRM
   async function fetchRouteFromOSRM(from: Coord, to: Coord): Promise<Coord[]> {
-    const url = `https://router.project-osrm.org/route/v1/driving/${from.longitude},${from.latitude};${to.longitude},${to.latitude}?overview=full&geometries=geojson`;
+    const url = `https://routing.openstreetmap.de/routed-foot/route/v1/walking/${from.longitude},${from.latitude};${to.longitude},${to.latitude}?overview=full&geometries=geojson`;
     const response = await fetch(url);
     const data = await response.json();
+    console.log(data);
 
     if (!data.routes || data.routes.length === 0) {
       throw new Error("Ruta no encontrada");
@@ -122,6 +124,10 @@ export default function App() {
             longitudeDelta: 0.01,
           }}
           showsUserLocation
+          onPress={(event) => {
+            const coords = event.nativeEvent.coordinate;
+            console.log({ coords });
+          }}
         >
           <Marker coordinate={location} title="Ubicación actual" />
           {route.length > 0 && (
