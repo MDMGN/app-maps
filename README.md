@@ -230,6 +230,8 @@ export default GeocodeApp;
 - Usando la API de **OSRM**, muestra una ruta entre dos puntos en el mapa.
 - API: https://router.project-osrm.org/route/v1/driving/{from.longitude},{from.latitude};{to.longitude},{to.latitude}?overview=full&geometries=geojson
 
+https://routing.openstreetmap.de/routed-car/route/v1/walking/${from.longitude},${from.latitude};${to.longitude},${to.latitude}?overview=full&geometries=geojson
+
 ### 3. **Crear una app de ubicación en tiempo real**
 
 - Usa **`Location.watchPositionAsync`** para rastrear y actualizar la ubicación del usuario en tiempo real.

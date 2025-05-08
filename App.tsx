@@ -58,7 +58,7 @@ export default function App() {
 
   // NUEVO: función para obtener ruta desde OSRM
   async function fetchRouteFromOSRM(from: Coord, to: Coord): Promise<Coord[]> {
-    const url = `https://routing.openstreetmap.de/routed-foot/route/v1/walking/${from.longitude},${from.latitude};${to.longitude},${to.latitude}?overview=full&geometries=geojson`;
+    const url = `https://routing.openstreetmap.de/routed-car/route/v1/walking/${from.longitude},${from.latitude};${to.longitude},${to.latitude}?overview=full&geometries=geojson`;
     const response = await fetch(url);
     const data = await response.json();
     console.log(data);
@@ -123,6 +123,7 @@ export default function App() {
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
+          mapType="terrain"
           showsUserLocation
           onPress={(event) => {
             const coords = event.nativeEvent.coordinate;
