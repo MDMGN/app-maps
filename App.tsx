@@ -50,8 +50,8 @@ export default function App() {
     }
     const { latitude, longitude } = result[0];
 
-    if (currentLocation.current !== null) {
-      const from = currentLocation.current;
+    const from = currentLocation.current;
+    if (from) {
       setRoute([from, { latitude, longitude }]);
     }
     setLocation({ latitude, longitude });
