@@ -9,7 +9,7 @@ import {
   View,
   ActivityIndicator,
 } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Geojson, Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 
 type Coord = {
@@ -22,7 +22,20 @@ export default function App() {
   const [address, setAddress] = useState("");
   const [route, setRoute] = useState<Coord[]>([]);
   const currentLocation = useRef<Coord | null>(null);
-
+  const mapRef = useRef<MapView | null>(null);
+  const myPlace = {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "Point",
+          coordinates: [64.165329, 48.844287],
+        },
+      },
+    ],
+  };
   // Obtener ubicación inicial
   useEffect(() => {
     (async () => {
@@ -40,21 +53,49 @@ export default function App() {
     })();
   }, []);
 
-  // Buscar dirección por texto
+  // ... imports como antes
+
+  // NUEVO: función para obtener ruta desde OSRM
+  async function fetchRouteFromOSRM(from: Coord, to: Coord): Promise<Coord[]> {
+    const url = `https://router.project-osrm.org/route/v1/driving/${from.longitude},${from.latitude};${to.longitude},${to.latitude}?overview=full&geometries=geojson`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.routes || data.routes.length === 0) {
+      throw new Error("Ruta no encontrada");
+    }
+
+    const coordinates = data.routes[0].geometry.coordinates;
+    return coordinates.map(([lon, lat]: [number, number]) => ({
+      latitude: lat,
+      longitude: lon,
+    }));
+  }
+
+  // Dentro del componente App
   const handleGeoCode = async () => {
     if (!address.trim()) return;
+
     const result = await Location.geocodeAsync(address.trim());
     if (result.length === 0) {
       Alert.alert("Dirección no encontrada");
       return;
     }
-    const { latitude, longitude } = result[0];
 
+    const { latitude, longitude } = result[0];
+    const to = { latitude, longitude };
     const from = currentLocation.current;
+
     if (from) {
-      setRoute([from, { latitude, longitude }]);
+      try {
+        const fullRoute = await fetchRouteFromOSRM(from, to);
+        setRoute(fullRoute);
+      } catch (err) {
+        Alert.alert("No se pudo obtener la ruta");
+      }
     }
-    setLocation({ latitude, longitude });
+
+    setLocation(to);
     Keyboard.dismiss();
   };
 
@@ -73,6 +114,7 @@ export default function App() {
 
       {location ? (
         <MapView
+          ref={mapRef}
           style={styles.map}
           region={{
             ...location,

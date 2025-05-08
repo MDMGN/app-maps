@@ -227,7 +227,8 @@ export default GeocodeApp;
 
 ### 2. **Implementar la funcionalidad de rutas**
 
-- Usando la API de **Directions de Google**, muestra una ruta entre dos puntos en el mapa.
+- Usando la API de **OSRM**, muestra una ruta entre dos puntos en el mapa.
+- API: https://router.project-osrm.org/route/v1/driving/{from.longitude},{from.latitude};{to.longitude},{to.latitude}?overview=full&geometries=geojson
 
 ### 3. **Crear una app de ubicación en tiempo real**
 
@@ -235,11 +236,13 @@ export default GeocodeApp;
 
 ### 4. **Agregar búsqueda de lugar**
 
-- Implementa un **autocomplete de lugares** usando la API de **Places** de Google Maps.
+- Implementa un **autocomplete de lugares** usando la API de **nominatim** .
 
-### 5. **Personalización del mapa**
+API: https://nominatim.openstreetmap.org/search?q={place}&format=json
 
-- Personaliza el mapa cambiando el estilo de los mapas o agregando diferentes capas (por ejemplo, satélite, tráfico en vivo).
+### 5: Personalización del mapa y Guardado de Marcadores al Tocar el Mapa
+
+En este ejercicio, aprenderás a personalizar un mapa y agregar marcadores dinámicamente. Los usuarios podrán tocar el mapa para agregar puntos de interés, y estos puntos se guardarán en un array y se mostrarán como marcadores en el mapa. (Usa el evento onPress de MApView)
 
 ---
 
