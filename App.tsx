@@ -16,13 +16,41 @@ type Coord = {
   latitude: number;
   longitude: number;
 };
+type Result = {
+  place_id: number;
+  licence: string;
+  osm_type: string;
+  osm_id: number;
+  lat: string;
+  lon: string;
+  class: string;
+  type: string;
+  place_rank: number;
+  importance: number;
+  addresstype: string;
+  name: string;
+  display_name: string;
+  boundingbox: string[];
+};
 
+// Converts JSON strings to/from your types
+export class Convert {
+  public static toResult(json: string): Result[] {
+    return JSON.parse(json);
+  }
+
+  public static resultToJson(value: Result[]): string {
+    return JSON.stringify(value);
+  }
+}
 export default function App() {
   const [location, setLocation] = useState<Coord | null>(null);
   const [address, setAddress] = useState("");
   const [route, setRoute] = useState<Coord[]>([]);
   const currentLocation = useRef<Coord | null>(null);
   const mapRef = useRef<MapView | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
+
   const myPlace = {
     type: "FeatureCollection",
     features: [
@@ -61,7 +89,6 @@ export default function App() {
     const url = `https://routing.openstreetmap.de/routed-car/route/v1/walking/${from.longitude},${from.latitude};${to.longitude},${to.latitude}?overview=full&geometries=geojson`;
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data);
 
     if (!data.routes || data.routes.length === 0) {
       throw new Error("Ruta no encontrada");
@@ -100,7 +127,14 @@ export default function App() {
     setLocation(to);
     Keyboard.dismiss();
   };
+  const handleSearch = async () => {
+    const results = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${address}&format=json`
+    ).then((res) => res.text());
 
+    console.log({ results });
+    //setResults(results.map((result) => result.name));
+  };
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -111,7 +145,12 @@ export default function App() {
           onChangeText={setAddress}
           value={address}
         />
-        <Button title="Buscar" onPress={handleGeoCode} />
+        <View style={{ flex: 1, position: "absolute" }}>
+          {results.map((result) => (
+            <Text>{result.name}</Text>
+          ))}
+        </View>
+        <Button title="Buscar" onPress={handleSearch} />
       </View>
 
       {location ? (
